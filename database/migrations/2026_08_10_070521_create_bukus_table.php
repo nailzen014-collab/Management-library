@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('judul');
             $table->integer('stock');
             $table->foreignId('author_id')->constrained('authors')->onDelete('cascade');
-            $table->foreignId('kategori_id')->constrained('kategoris')->onDelete('cascade');
             $table->timestamps();
         });
     }

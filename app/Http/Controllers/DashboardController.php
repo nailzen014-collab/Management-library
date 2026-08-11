@@ -37,7 +37,7 @@ class DashboardController extends Controller
         }
  
         // Buku terbaru buat "Recent Activity"
-        $recentBuku = buku::with(['author', 'kategori'])
+        $recentBuku = buku::with(['author', 'kategoris'])
             ->latest()
             ->take(5)
             ->get();
