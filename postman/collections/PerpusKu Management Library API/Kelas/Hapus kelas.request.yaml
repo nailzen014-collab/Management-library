@@ -1,0 +1,23 @@
+$kind: http-request
+description: Kelas tidak dapat dihapus jika masih memiliki siswa terkait.
+url: "{{baseUrl}}/kelas/:kelas_id"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: kelas_id
+    value: "1"
+    disabled: false
+    description: (Required) ID kelas.
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+settings: {}
+examples: ./.resources/Hapus kelas.resources/examples
+order: 6000

@@ -1,0 +1,36 @@
+$kind: http-request
+description: Mengembalikan daftar siswa atau anggota perpustakaan dengan pagination. Mendukung pencarian nama atau NIS dan filter kelas.
+url: "{{baseUrl}}/siswa?search=OpenAPI&kelas_id=1&page=1&per_page=10"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: search
+    value: OpenAPI
+    disabled: false
+    description: Kata kunci pencarian. Untuk buku mencari judul; untuk siswa mencari nama atau NIS; untuk author, kategori, dan kelas mencari nama.
+  - key: kelas_id
+    value: "1"
+    disabled: false
+    description: Filter siswa berdasarkan ID kelas.
+  - key: page
+    value: "1"
+    disabled: false
+    description: Nomor halaman data.
+  - key: per_page
+    value: "10"
+    disabled: false
+    description: Jumlah data per halaman (maksimal 100).
+pathVariables:
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+settings: {}
+examples: ./.resources/Daftar siswa.resources/examples
+order: 1000

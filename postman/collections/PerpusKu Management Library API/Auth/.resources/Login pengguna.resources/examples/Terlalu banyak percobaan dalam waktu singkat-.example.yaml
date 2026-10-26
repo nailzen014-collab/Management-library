@@ -1,0 +1,40 @@
+$kind: http-example
+name: Terlalu banyak percobaan dalam waktu singkat.
+request:
+  url: "{{baseUrl}}/login"
+  method: POST
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: json
+    content: |-
+      {
+        "email": "api.tester@example.com",
+        "password": "password"
+      }
+response:
+  statusCode: 429
+  statusText: Too Many Requests
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Too Many Attempts."
+      }
+order: 3000

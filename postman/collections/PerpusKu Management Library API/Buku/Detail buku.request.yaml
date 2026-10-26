@@ -1,0 +1,23 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/buku/:buku_id"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: buku_id
+    value: "1"
+    disabled: false
+    description: (Required) ID buku.
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+settings: {}
+examples: ./.resources/Detail buku.resources/examples
+order: 3000

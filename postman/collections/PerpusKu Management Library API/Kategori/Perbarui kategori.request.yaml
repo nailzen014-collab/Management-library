@@ -1,0 +1,30 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/kategori/:kategori_id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: kategori_id
+    value: "1"
+    disabled: false
+    description: (Required) ID kategori.
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+body:
+  type: json
+  content: |-
+    {
+      "nama_kategori": "Programming"
+    }
+settings: {}
+examples: ./.resources/Perbarui kategori.resources/examples
+order: 4000

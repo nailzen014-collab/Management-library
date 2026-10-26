@@ -1,0 +1,3 @@
+$kind: collection
+description: Pengelolaan koleksi buku dan relasinya dengan author serta kategori.
+order: 3000

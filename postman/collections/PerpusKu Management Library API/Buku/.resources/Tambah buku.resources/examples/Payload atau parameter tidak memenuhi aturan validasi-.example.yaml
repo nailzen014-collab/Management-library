@@ -1,0 +1,59 @@
+$kind: http-example
+name: Payload atau parameter tidak memenuhi aturan validasi.
+request:
+  url: "{{baseUrl}}/buku"
+  method: POST
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: json
+    content: |-
+      {
+        "judul": "Belajar OpenAPI",
+        "stock": 5,
+        "author_id": 1,
+        "kategori_id": [
+          1,
+          2
+        ]
+      }
+response:
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "message": "The judul field is required. (and 3 more errors)",
+        "errors": {
+          "judul": [
+            "The judul field is required."
+          ],
+          "stock": [
+            "The stock field must be at least 0."
+          ],
+          "author_id": [
+            "The selected author id is invalid."
+          ],
+          "kategori_id": [
+            "The kategori id field is required."
+          ]
+        }
+      }
+order: 3000

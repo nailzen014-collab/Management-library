@@ -1,0 +1,26 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/author"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+body:
+  type: json
+  content: |-
+    {
+      "nama_author": "Eko Kurniawan"
+    }
+settings: {}
+examples: ./.resources/Tambah author.resources/examples
+order: 2000

@@ -1,0 +1,40 @@
+$kind: http-example
+name: Data tidak dapat dihapus karena masih memiliki relasi.
+request:
+  url: "{{baseUrl}}/author/:author_id"
+  method: DELETE
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: author_id
+      value: "1"
+      disabled: false
+      description: (Required) ID author.
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Kelas tidak bisa dihapus karena masih punya siswa terkait."
+      }
+order: 4000

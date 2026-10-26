@@ -1,0 +1,19 @@
+$kind: http-request
+description: Menghapus token API aktif milik pengguna. Token lama tidak dapat digunakan lagi.
+url: "{{baseUrl}}/logout"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+settings: {}
+examples: ./.resources/Logout dan cabut token.resources/examples
+order: 4000

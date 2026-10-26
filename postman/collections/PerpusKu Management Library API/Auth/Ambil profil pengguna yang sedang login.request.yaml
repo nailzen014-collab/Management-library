@@ -1,0 +1,19 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/me"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+settings: {}
+examples: ./.resources/Ambil profil pengguna yang sedang login.resources/examples
+order: 3000

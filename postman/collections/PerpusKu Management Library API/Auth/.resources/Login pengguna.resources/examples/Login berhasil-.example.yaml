@@ -1,0 +1,49 @@
+$kind: http-example
+name: Login berhasil.
+request:
+  url: "{{baseUrl}}/login"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: json
+    content: |-
+      {
+        "email": "api.tester@example.com",
+        "password": "password"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Login berhasil.",
+        "data": {
+          "user": {
+            "id": 1,
+            "name": "API Tester",
+            "email": "api.tester@example.com",
+            "email_verified_at": "2026-10-26T08:00:00.000000Z",
+            "created_at": "2026-10-26T08:00:00.000000Z",
+            "updated_at": "2026-10-26T08:00:00.000000Z"
+          },
+          "token": "5f8d0d55b54764421b7156c3d5a7c3f9b5e4c1a2d3f6e7a8b9c0d1e2f3a4b5c6",
+          "token_type": "Bearer"
+        }
+      }
+order: 1000

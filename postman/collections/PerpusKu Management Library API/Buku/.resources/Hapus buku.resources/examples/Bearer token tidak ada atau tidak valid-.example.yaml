@@ -1,0 +1,40 @@
+$kind: http-example
+name: Bearer token tidak ada atau tidak valid.
+request:
+  url: "{{baseUrl}}/buku/:buku_id"
+  method: DELETE
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: buku_id
+      value: "1"
+      disabled: false
+      description: (Required) ID buku.
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Unauthenticated."
+      }
+order: 2000

@@ -43,6 +43,11 @@
                               {{ request()->routeIs('siswa.*') ? 'bg-violet-600/20 text-violet-400' : 'text-stone-400 hover:text-white hover:bg-stone-800' }}">
                         <i class="fa-solid fa-user-graduate me-1"></i> Siswa
                     </a>
+                    <a href="{{ route('api.docs') }}"
+                       class="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                              {{ request()->routeIs('api.docs') ? 'bg-violet-600/20 text-violet-400' : 'text-stone-400 hover:text-white hover:bg-stone-800' }}">
+                        <i class="fa-solid fa-code me-1"></i> Dokumentasi API
+                    </a>
                 </div>
             </div>
 
@@ -118,6 +123,10 @@
             <a href="{{ route('siswa.index') }}"
                class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('siswa.*') ? 'bg-violet-600/20 text-violet-400' : 'text-stone-400 hover:bg-stone-800 hover:text-white' }}">
                 <i class="fa-solid fa-user-graduate me-2 w-4"></i> Siswa
+            </a>
+            <a href="{{ route('api.docs') }}"
+               class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('api.docs') ? 'bg-violet-600/20 text-violet-400' : 'text-stone-400 hover:bg-stone-800 hover:text-white' }}">
+                <i class="fa-solid fa-code me-2 w-4"></i> Dokumentasi API
             </a>
         </div>
 

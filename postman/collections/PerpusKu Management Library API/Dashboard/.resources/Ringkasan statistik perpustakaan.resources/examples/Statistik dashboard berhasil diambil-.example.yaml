@@ -1,0 +1,86 @@
+$kind: http-example
+name: Statistik dashboard berhasil diambil.
+request:
+  url: "{{baseUrl}}/dashboard"
+  method: GET
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "data": {
+          "stats": {
+            "total_buku": 120,
+            "total_author": 18,
+            "total_kategori": 9,
+            "total_siswa": 240,
+            "total_kelas": 12
+          },
+          "chart": {
+            "labels": [
+              "Mei",
+              "Jun",
+              "Jul",
+              "Agu",
+              "Sep",
+              "Okt"
+            ],
+            "data": [
+              3,
+              5,
+              2,
+              8,
+              6,
+              4
+            ]
+          },
+          "recent_buku": [
+            {
+              "id": 1,
+              "judul": "Belajar OpenAPI",
+              "stock": 5,
+              "author_id": 1,
+              "author": {
+                "id": 1,
+                "nama_author": "Eko Kurniawan",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              },
+              "kategoris": [
+                {
+                  "id": 1,
+                  "nama_kategori": "Programming",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z"
+                }
+              ],
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            }
+          ]
+        }
+      }
+order: 1000

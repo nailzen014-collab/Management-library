@@ -1,0 +1,2702 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "PerpusKu Management Library API",
+    "description": "Kontrak API JSON untuk aplikasi Management Library (PerpusKu). API ini mengikuti data dan aturan validasi yang ada pada website: autentikasi pengguna, dashboard, buku, author, kategori, kelas, dan siswa (anggota perpustakaan).\n\nCatatan: fitur peminjaman belum tersedia pada aplikasi saat ini, sehingga belum didokumentasikan sebagai endpoint. Semua endpoint yang dilindungi menggunakan Bearer token yang diperoleh dari endpoint login atau register.",
+    "termsOfService": "https://github.com/nailzen014-collab/Management-library",
+    "contact": {
+      "name": "Tim PerpusKu",
+      "url": "https://github.com/nailzen014-collab/Management-library"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Kontrak API dan panduan penggunaan",
+    "url": "https://github.com/nailzen014-collab/Management-library/blob/main/docs/kontrak-api.md"
+  },
+  "servers": [
+    {
+      "url": "{scheme}://{host}:{port}/api/v1",
+      "description": "Server pengembangan lokal",
+      "variables": {
+        "scheme": {
+          "default": "http",
+          "enum": ["http", "https"],
+          "description": "Skema protokol yang digunakan."
+        },
+        "host": {
+          "default": "localhost",
+          "description": "Host tempat aplikasi berjalan."
+        },
+        "port": {
+          "default": "8000",
+          "description": "Port aplikasi Laravel."
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Registrasi, login, profil pengguna, dan logout."
+    },
+    {
+      "name": "Dashboard",
+      "description": "Ringkasan statistik perpustakaan."
+    },
+    {
+      "name": "Buku",
+      "description": "Pengelolaan koleksi buku dan relasinya dengan author serta kategori."
+    },
+    {
+      "name": "Author",
+      "description": "Pengelolaan data penulis buku."
+    },
+    {
+      "name": "Kategori",
+      "description": "Pengelolaan kategori buku."
+    },
+    {
+      "name": "Kelas",
+      "description": "Pengelolaan kelas untuk siswa."
+    },
+    {
+      "name": "Siswa",
+      "description": "Pengelolaan data siswa atau anggota perpustakaan."
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Registrasi pengguna baru",
+        "description": "Membuat akun pengguna baru lalu langsung mengembalikan Bearer token agar dapat mengakses endpoint lain.",
+        "operationId": "registerUser",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/RegisterRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registrasi berhasil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/RegisterResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login pengguna",
+        "description": "Memvalidasi email dan password, lalu mengembalikan Bearer token baru.",
+        "operationId": "loginUser",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/LoginRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/AuthResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Ambil profil pengguna yang sedang login",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "Profil pengguna berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/UserResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout dan cabut token",
+        "description": "Menghapus token API aktif milik pengguna. Token lama tidak dapat digunakan lagi.",
+        "operationId": "logoutUser",
+        "responses": {
+          "200": {
+            "description": "Logout berhasil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "message": "Logout berhasil."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Ringkasan statistik perpustakaan",
+        "description": "Mengembalikan jumlah buku, author, kategori, siswa, kelas, grafik buku enam bulan terakhir, dan lima buku terbaru.",
+        "operationId": "getDashboard",
+        "responses": {
+          "200": {
+            "description": "Statistik dashboard berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/DashboardResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/buku": {
+      "get": {
+        "tags": ["Buku"],
+        "summary": "Daftar buku",
+        "description": "Mengembalikan daftar buku dengan pagination. Mendukung pencarian judul dan filter author atau kategori.",
+        "operationId": "listBuku",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          },
+          {
+            "$ref": "#/components/parameters/AuthorIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/KategoriIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar buku berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedBuku"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/PaginatedBukuExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Buku"],
+        "summary": "Tambah buku",
+        "operationId": "createBuku",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BukuInput"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/BukuCreateRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Buku berhasil ditambahkan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BukuResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/BukuResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/buku/{buku_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/BukuIdPath"
+        }
+      ],
+      "get": {
+        "tags": ["Buku"],
+        "summary": "Detail buku",
+        "operationId": "getBuku",
+        "responses": {
+          "200": {
+            "description": "Detail buku berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BukuDetailResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/BukuDetailResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Buku"],
+        "summary": "Perbarui buku",
+        "operationId": "updateBuku",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BukuInput"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/BukuUpdateRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Buku berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BukuResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/BukuUpdateResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Buku"],
+        "summary": "Perbarui sebagian data buku",
+        "operationId": "patchBuku",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BukuInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Buku berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BukuResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Buku"],
+        "summary": "Hapus buku",
+        "operationId": "deleteBuku",
+        "responses": {
+          "200": {
+            "description": "Buku berhasil dihapus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "message": "Buku berhasil dihapus."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/author": {
+      "get": {
+        "tags": ["Author"],
+        "summary": "Daftar author",
+        "operationId": "listAuthor",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar author berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedAuthor"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Author"],
+        "summary": "Tambah author",
+        "operationId": "createAuthor",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorInput"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/AuthorCreateRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Author berhasil ditambahkan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/author/{author_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/AuthorIdPath"
+        }
+      ],
+      "get": {
+        "tags": ["Author"],
+        "summary": "Detail author",
+        "operationId": "getAuthor",
+        "responses": {
+          "200": {
+            "description": "Detail author berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Author"],
+        "summary": "Perbarui author",
+        "operationId": "updateAuthor",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Author berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Author"],
+        "summary": "Perbarui sebagian data author",
+        "operationId": "patchAuthor",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Author berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Author"],
+        "summary": "Hapus author",
+        "description": "Author tidak dapat dihapus jika masih memiliki buku terkait.",
+        "operationId": "deleteAuthor",
+        "responses": {
+          "200": {
+            "description": "Author berhasil dihapus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/kategori": {
+      "get": {
+        "tags": ["Kategori"],
+        "summary": "Daftar kategori",
+        "operationId": "listKategori",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar kategori berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedKategori"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Kategori"],
+        "summary": "Tambah kategori",
+        "operationId": "createKategori",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KategoriInput"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/KategoriCreateRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Kategori berhasil ditambahkan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KategoriResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/kategori/{kategori_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/KategoriIdPath"
+        }
+      ],
+      "get": {
+        "tags": ["Kategori"],
+        "summary": "Detail kategori",
+        "operationId": "getKategori",
+        "responses": {
+          "200": {
+            "description": "Detail kategori berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KategoriDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Kategori"],
+        "summary": "Perbarui kategori",
+        "operationId": "updateKategori",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KategoriInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kategori berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KategoriResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Kategori"],
+        "summary": "Perbarui sebagian data kategori",
+        "operationId": "patchKategori",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KategoriInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kategori berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KategoriResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Kategori"],
+        "summary": "Hapus kategori",
+        "description": "Kategori tidak dapat dihapus jika masih memiliki buku terkait.",
+        "operationId": "deleteKategori",
+        "responses": {
+          "200": {
+            "description": "Kategori berhasil dihapus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/kelas": {
+      "get": {
+        "tags": ["Kelas"],
+        "summary": "Daftar kelas",
+        "operationId": "listKelas",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar kelas berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedKelas"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Kelas"],
+        "summary": "Tambah kelas",
+        "operationId": "createKelas",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KelasInput"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/KelasCreateRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Kelas berhasil ditambahkan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KelasResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/kelas/{kelas_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/KelasIdPath"
+        }
+      ],
+      "get": {
+        "tags": ["Kelas"],
+        "summary": "Detail kelas",
+        "operationId": "getKelas",
+        "responses": {
+          "200": {
+            "description": "Detail kelas berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KelasDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Kelas"],
+        "summary": "Perbarui kelas",
+        "operationId": "updateKelas",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KelasInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kelas berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KelasResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Kelas"],
+        "summary": "Perbarui sebagian data kelas",
+        "operationId": "patchKelas",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KelasInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kelas berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KelasResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Kelas"],
+        "summary": "Hapus kelas",
+        "description": "Kelas tidak dapat dihapus jika masih memiliki siswa terkait.",
+        "operationId": "deleteKelas",
+        "responses": {
+          "200": {
+            "description": "Kelas berhasil dihapus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/siswa": {
+      "get": {
+        "tags": ["Siswa"],
+        "summary": "Daftar siswa",
+        "description": "Mengembalikan daftar siswa atau anggota perpustakaan dengan pagination. Mendukung pencarian nama atau NIS dan filter kelas.",
+        "operationId": "listSiswa",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          },
+          {
+            "$ref": "#/components/parameters/KelasIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar siswa berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSiswa"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Siswa"],
+        "summary": "Tambah siswa",
+        "operationId": "createSiswa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiswaInput"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/SiswaCreateRequestExample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Siswa berhasil ditambahkan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiswaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/siswa/{siswa_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/SiswaIdPath"
+        }
+      ],
+      "get": {
+        "tags": ["Siswa"],
+        "summary": "Detail siswa",
+        "operationId": "getSiswa",
+        "responses": {
+          "200": {
+            "description": "Detail siswa berhasil diambil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiswaDetailResponse"
+                },
+                "examples": {
+                  "success": {
+                    "$ref": "#/components/examples/SiswaDetailResponseExample"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Siswa"],
+        "summary": "Perbarui siswa",
+        "operationId": "updateSiswa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiswaInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data siswa berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiswaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Siswa"],
+        "summary": "Perbarui sebagian data siswa",
+        "operationId": "patchSiswa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiswaInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data siswa berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiswaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Siswa"],
+        "summary": "Hapus siswa",
+        "operationId": "deleteSiswa",
+        "responses": {
+          "200": {
+            "description": "Siswa berhasil dihapus.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Token",
+        "description": "Masukkan token dari endpoint /login atau /register. Format header: Authorization: Bearer <token>."
+      }
+    },
+    "parameters": {
+      "Search": {
+        "name": "search",
+        "in": "query",
+        "description": "Kata kunci pencarian. Untuk buku mencari judul; untuk siswa mencari nama atau NIS; untuk author, kategori, dan kelas mencari nama.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "example": "OpenAPI"
+        }
+      },
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "description": "Nomor halaman data.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "example": 1
+        }
+      },
+      "PerPage": {
+        "name": "per_page",
+        "in": "query",
+        "description": "Jumlah data per halaman (maksimal 100).",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "example": 10
+        }
+      },
+      "AuthorIdQuery": {
+        "name": "author_id",
+        "in": "query",
+        "description": "Filter buku berdasarkan ID author.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "KategoriIdQuery": {
+        "name": "kategori_id",
+        "in": "query",
+        "description": "Filter buku berdasarkan ID kategori.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "KelasIdQuery": {
+        "name": "kelas_id",
+        "in": "query",
+        "description": "Filter siswa berdasarkan ID kelas.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "BukuIdPath": {
+        "name": "buku_id",
+        "in": "path",
+        "description": "ID buku.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "AuthorIdPath": {
+        "name": "author_id",
+        "in": "path",
+        "description": "ID author.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "KategoriIdPath": {
+        "name": "kategori_id",
+        "in": "path",
+        "description": "ID kategori.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "KelasIdPath": {
+        "name": "kelas_id",
+        "in": "path",
+        "description": "ID kelas.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "SiswaIdPath": {
+        "name": "siswa_id",
+        "in": "path",
+        "description": "ID siswa.",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["id", "name", "email", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "API Tester"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255,
+            "example": "api.tester@example.com"
+          },
+          "email_verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password", "password_confirmation"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "API Tester"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255,
+            "example": "api.tester@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "example": "password"
+          },
+          "password_confirmation": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "example": "password"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "api.tester@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "password"
+          }
+        }
+      },
+      "AuthData": {
+        "type": "object",
+        "required": ["user", "token", "token_type"],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "token": {
+            "type": "string",
+            "description": "Bearer token untuk mengakses endpoint yang dilindungi.",
+            "example": "5f8d0d55b54764421b7156c3d5a7c3f9b5e4c1a2d3f6e7a8b9c0d1e2f3a4b5c6"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": ["Bearer"],
+            "example": "Bearer"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "required": ["message", "data"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login berhasil."
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthData"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operasi berhasil."
+          }
+        }
+      },
+      "Author": {
+        "type": "object",
+        "required": ["id", "nama_author", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "nama_author": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Eko Kurniawan"
+          },
+          "buku_count": {
+            "type": "integer",
+            "description": "Jumlah buku yang ditulis author ini. Hadir pada endpoint daftar dan detail author.",
+            "example": 2
+          },
+          "buku": {
+            "type": "array",
+            "description": "Daftar buku author ini. Hadir pada endpoint detail author.",
+            "items": {
+              "$ref": "#/components/schemas/Buku"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "AuthorInput": {
+        "type": "object",
+        "required": ["nama_author"],
+        "properties": {
+          "nama_author": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Eko Kurniawan"
+          }
+        }
+      },
+      "AuthorResponse": {
+        "type": "object",
+        "required": ["message", "data"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Author berhasil ditambahkan."
+          },
+          "data": {
+            "$ref": "#/components/schemas/Author"
+          }
+        }
+      },
+      "AuthorDetailResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Author"
+          }
+        }
+      },
+      "Kategori": {
+        "type": "object",
+        "required": ["id", "nama_kategori", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "nama_kategori": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Programming"
+          },
+          "buku_count": {
+            "type": "integer",
+            "description": "Jumlah buku dalam kategori ini. Hadir pada endpoint daftar dan detail kategori.",
+            "example": 3
+          },
+          "buku": {
+            "type": "array",
+            "description": "Daftar buku dalam kategori ini. Hadir pada endpoint detail kategori.",
+            "items": {
+              "$ref": "#/components/schemas/Buku"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "KategoriInput": {
+        "type": "object",
+        "required": ["nama_kategori"],
+        "properties": {
+          "nama_kategori": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Programming"
+          }
+        }
+      },
+      "KategoriResponse": {
+        "type": "object",
+        "required": ["message", "data"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Kategori berhasil ditambahkan."
+          },
+          "data": {
+            "$ref": "#/components/schemas/Kategori"
+          }
+        }
+      },
+      "KategoriDetailResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Kategori"
+          }
+        }
+      },
+      "Kelas": {
+        "type": "object",
+        "required": ["id", "nama_kelas", "tingkat", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "nama_kelas": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "XI RPL 1"
+          },
+          "tingkat": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "XI"
+          },
+          "siswa_count": {
+            "type": "integer",
+            "description": "Jumlah siswa dalam kelas ini. Hadir pada endpoint daftar dan detail kelas.",
+            "example": 32
+          },
+          "siswa": {
+            "type": "array",
+            "description": "Daftar siswa dalam kelas ini. Hadir pada endpoint detail kelas.",
+            "items": {
+              "$ref": "#/components/schemas/Siswa"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "KelasInput": {
+        "type": "object",
+        "required": ["nama_kelas", "tingkat"],
+        "properties": {
+          "nama_kelas": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "XI RPL 1"
+          },
+          "tingkat": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "XI"
+          }
+        }
+      },
+      "KelasResponse": {
+        "type": "object",
+        "required": ["message", "data"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Kelas berhasil ditambahkan."
+          },
+          "data": {
+            "$ref": "#/components/schemas/Kelas"
+          }
+        }
+      },
+      "KelasDetailResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Kelas"
+          }
+        }
+      },
+      "Siswa": {
+        "type": "object",
+        "required": ["id", "nama", "nis", "kelas_id", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "nama": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Budi Santoso"
+          },
+          "nis": {
+            "type": "integer",
+            "format": "int32",
+            "example": 12345
+          },
+          "kelas_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "kelas": {
+            "$ref": "#/components/schemas/Kelas"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "SiswaInput": {
+        "type": "object",
+        "required": ["nama", "nis", "kelas_id"],
+        "properties": {
+          "nama": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Budi Santoso"
+          },
+          "nis": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Nomor Induk Siswa, harus unik.",
+            "example": 12345
+          },
+          "kelas_id": {
+            "type": "integer",
+            "description": "ID kelas yang harus sudah ada.",
+            "example": 1
+          }
+        }
+      },
+      "SiswaResponse": {
+        "type": "object",
+        "required": ["message", "data"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Siswa berhasil ditambahkan."
+          },
+          "data": {
+            "$ref": "#/components/schemas/Siswa"
+          }
+        }
+      },
+      "SiswaDetailResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Siswa"
+          }
+        }
+      },
+      "Buku": {
+        "type": "object",
+        "required": ["id", "judul", "stock", "author_id", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "judul": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Belajar OpenAPI"
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0,
+            "example": 5
+          },
+          "author_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "author": {
+            "$ref": "#/components/schemas/Author"
+          },
+          "kategoris": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kategori"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "BukuInput": {
+        "type": "object",
+        "required": ["judul", "stock", "author_id", "kategori_id"],
+        "properties": {
+          "judul": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Belajar OpenAPI"
+          },
+          "stock": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 5
+          },
+          "author_id": {
+            "type": "integer",
+            "description": "ID author yang harus sudah ada.",
+            "example": 1
+          },
+          "kategori_id": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Daftar ID kategori. Minimal satu kategori.",
+            "items": {
+              "type": "integer",
+              "example": 1
+            },
+            "example": [1, 2]
+          }
+        }
+      },
+      "BukuResponse": {
+        "type": "object",
+        "required": ["message", "data"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Buku berhasil ditambahkan."
+          },
+          "data": {
+            "$ref": "#/components/schemas/Buku"
+          }
+        }
+      },
+      "BukuDetailResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Buku"
+          }
+        }
+      },
+      "PaginationLink": {
+        "type": "object",
+        "required": ["url", "label", "active"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "example": "http://localhost:8000/api/v1/buku?page=2"
+          },
+          "label": {
+            "type": "string",
+            "example": "2"
+          },
+          "active": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "PaginatedBuku": {
+        "type": "object",
+        "required": ["current_page", "data", "last_page", "per_page", "total"],
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Buku"
+            }
+          },
+          "first_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": "http://localhost:8000/api/v1/buku?page=1"
+          },
+          "from": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "last_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": "http://localhost:8000/api/v1/buku?page=1"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaginationLink"
+            }
+          },
+          "next_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "path": {
+            "type": "string",
+            "example": "http://localhost:8000/api/v1/buku"
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "prev_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "to": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "total": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PaginatedAuthor": {
+        "type": "object",
+        "required": ["current_page", "data", "last_page", "per_page", "total"],
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Author"
+            }
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PaginatedKategori": {
+        "type": "object",
+        "required": ["current_page", "data", "last_page", "per_page", "total"],
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kategori"
+            }
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PaginatedKelas": {
+        "type": "object",
+        "required": ["current_page", "data", "last_page", "per_page", "total"],
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kelas"
+            }
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PaginatedSiswa": {
+        "type": "object",
+        "required": ["current_page", "data", "last_page", "per_page", "total"],
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Siswa"
+            }
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "DashboardResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": ["stats", "chart", "recent_buku"],
+            "properties": {
+              "stats": {
+                "type": "object",
+                "required": ["total_buku", "total_author", "total_kategori", "total_siswa", "total_kelas"],
+                "properties": {
+                  "total_buku": {
+                    "type": "integer",
+                    "example": 120
+                  },
+                  "total_author": {
+                    "type": "integer",
+                    "example": 18
+                  },
+                  "total_kategori": {
+                    "type": "integer",
+                    "example": 9
+                  },
+                  "total_siswa": {
+                    "type": "integer",
+                    "example": 240
+                  },
+                  "total_kelas": {
+                    "type": "integer",
+                    "example": 12
+                  }
+                }
+              },
+              "chart": {
+                "type": "object",
+                "required": ["labels", "data"],
+                "properties": {
+                  "labels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "Mei"
+                    },
+                    "example": ["Mei", "Jun", "Jul", "Agu", "Sep", "Okt"]
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 4
+                    },
+                    "example": [3, 5, 2, 8, 6, 4]
+                  }
+                }
+              },
+              "recent_buku": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Buku"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": ["message", "errors"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "The judul field is required. (and 3 more errors)"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": {
+              "judul": ["The judul field is required."],
+              "stock": ["The stock field must be at least 0."],
+              "author_id": ["The selected author id is invalid."],
+              "kategori_id": ["The kategori id field is required."]
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Terjadi kesalahan."
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Bearer token tidak ada atau tidak valid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "unauthenticated": {
+                "value": {
+                  "message": "Unauthenticated."
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Data dengan ID yang diminta tidak ditemukan.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "notFound": {
+                "value": {
+                  "message": "Data tidak ditemukan."
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Payload atau parameter tidak memenuhi aturan validasi.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "examples": {
+              "validation": {
+                "$ref": "#/components/examples/ValidationErrorExample"
+              }
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Data tidak dapat dihapus karena masih memiliki relasi.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "conflict": {
+                "value": {
+                  "message": "Kelas tidak bisa dihapus karena masih punya siswa terkait."
+                }
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Terlalu banyak percobaan dalam waktu singkat.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "throttled": {
+                "value": {
+                  "message": "Too Many Attempts."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "examples": {
+      "RegisterRequestExample": {
+        "summary": "Registrasi pengguna baru",
+        "value": {
+          "name": "API Tester",
+          "email": "api.tester@example.com",
+          "password": "password",
+          "password_confirmation": "password"
+        }
+      },
+      "LoginRequestExample": {
+        "summary": "Login dengan email dan password",
+        "value": {
+          "email": "api.tester@example.com",
+          "password": "password"
+        }
+      },
+      "AuthResponseExample": {
+        "summary": "Respons autentikasi berhasil",
+        "value": {
+          "message": "Login berhasil.",
+          "data": {
+            "user": {
+              "id": 1,
+              "name": "API Tester",
+              "email": "api.tester@example.com",
+              "email_verified_at": "2026-10-26T08:00:00.000000Z",
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            },
+            "token": "5f8d0d55b54764421b7156c3d5a7c3f9b5e4c1a2d3f6e7a8b9c0d1e2f3a4b5c6",
+            "token_type": "Bearer"
+          }
+        }
+      },
+      "RegisterResponseExample": {
+        "summary": "Registrasi berhasil",
+        "value": {
+          "message": "Registrasi berhasil.",
+          "data": {
+            "user": {
+              "id": 1,
+              "name": "API Tester",
+              "email": "api.tester@example.com",
+              "email_verified_at": null,
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            },
+            "token": "5f8d0d55b54764421b7156c3d5a7c3f9b5e4c1a2d3f6e7a8b9c0d1e2f3a4b5c6",
+            "token_type": "Bearer"
+          }
+        }
+      },
+      "UserResponseExample": {
+        "summary": "Profil pengguna yang sedang login",
+        "value": {
+          "data": {
+            "id": 1,
+            "name": "API Tester",
+            "email": "api.tester@example.com",
+            "email_verified_at": "2026-10-26T08:00:00.000000Z",
+            "created_at": "2026-10-26T08:00:00.000000Z",
+            "updated_at": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "AuthorCreateRequestExample": {
+        "summary": "Tambah author",
+        "value": {
+          "nama_author": "Eko Kurniawan"
+        }
+      },
+      "KategoriCreateRequestExample": {
+        "summary": "Tambah kategori",
+        "value": {
+          "nama_kategori": "Programming"
+        }
+      },
+      "KelasCreateRequestExample": {
+        "summary": "Tambah kelas",
+        "value": {
+          "nama_kelas": "XI RPL 1",
+          "tingkat": "XI"
+        }
+      },
+      "SiswaCreateRequestExample": {
+        "summary": "Tambah siswa",
+        "value": {
+          "nama": "Budi Santoso",
+          "nis": 12345,
+          "kelas_id": 1
+        }
+      },
+      "BukuCreateRequestExample": {
+        "summary": "Tambah buku",
+        "value": {
+          "judul": "Belajar OpenAPI",
+          "stock": 5,
+          "author_id": 1,
+          "kategori_id": [1, 2]
+        }
+      },
+      "BukuUpdateRequestExample": {
+        "summary": "Perbarui buku",
+        "value": {
+          "judul": "Belajar OpenAPI 3.0",
+          "stock": 8,
+          "author_id": 1,
+          "kategori_id": [1, 2]
+        }
+      },
+      "BukuResponseExample": {
+        "summary": "Detail buku beserta author dan kategori",
+        "value": {
+          "message": "Buku berhasil ditambahkan.",
+          "data": {
+            "id": 1,
+            "judul": "Belajar OpenAPI",
+            "stock": 5,
+            "author_id": 1,
+            "author": {
+              "id": 1,
+              "nama_author": "Eko Kurniawan",
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            },
+            "kategoris": [
+              {
+                "id": 1,
+                "nama_kategori": "Programming",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              },
+              {
+                "id": 2,
+                "nama_kategori": "Web Development",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              }
+            ],
+            "created_at": "2026-10-26T08:00:00.000000Z",
+            "updated_at": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "BukuDetailResponseExample": {
+        "summary": "Detail buku beserta author dan kategori",
+        "value": {
+          "data": {
+            "id": 1,
+            "judul": "Belajar OpenAPI",
+            "stock": 5,
+            "author_id": 1,
+            "author": {
+              "id": 1,
+              "nama_author": "Eko Kurniawan",
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            },
+            "kategoris": [
+              {
+                "id": 1,
+                "nama_kategori": "Programming",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              },
+              {
+                "id": 2,
+                "nama_kategori": "Web Development",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              }
+            ],
+            "created_at": "2026-10-26T08:00:00.000000Z",
+            "updated_at": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "BukuUpdateResponseExample": {
+        "summary": "Buku berhasil diperbarui",
+        "value": {
+          "message": "Buku berhasil diperbarui.",
+          "data": {
+            "id": 1,
+            "judul": "Belajar OpenAPI 3.0",
+            "stock": 8,
+            "author_id": 1,
+            "author": {
+              "id": 1,
+              "nama_author": "Eko Kurniawan",
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            },
+            "kategoris": [
+              {
+                "id": 1,
+                "nama_kategori": "Programming",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              },
+              {
+                "id": 2,
+                "nama_kategori": "Web Development",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              }
+            ],
+            "created_at": "2026-10-26T08:00:00.000000Z",
+            "updated_at": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "PaginatedBukuExample": {
+        "summary": "Daftar buku dengan pagination",
+        "value": {
+          "current_page": 1,
+          "data": [
+            {
+              "id": 1,
+              "judul": "Belajar OpenAPI",
+              "stock": 5,
+              "author_id": 1,
+              "author": {
+                "id": 1,
+                "nama_author": "Eko Kurniawan",
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              },
+              "kategoris": [
+                {
+                  "id": 1,
+                  "nama_kategori": "Programming",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z"
+                }
+              ],
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            }
+          ],
+          "first_page_url": "http://localhost:8000/api/v1/buku?page=1",
+          "from": 1,
+          "last_page": 1,
+          "last_page_url": "http://localhost:8000/api/v1/buku?page=1",
+          "links": [
+            {
+              "url": null,
+              "label": "&laquo; Previous",
+              "active": false
+            },
+            {
+              "url": "http://localhost:8000/api/v1/buku?page=1",
+              "label": "1",
+              "active": true
+            },
+            {
+              "url": null,
+              "label": "Next &raquo;",
+              "active": false
+            }
+          ],
+          "next_page_url": null,
+          "path": "http://localhost:8000/api/v1/buku",
+          "per_page": 10,
+          "prev_page_url": null,
+          "to": 1,
+          "total": 1
+        }
+      },
+      "SiswaDetailResponseExample": {
+        "summary": "Detail siswa beserta kelas",
+        "value": {
+          "data": {
+            "id": 1,
+            "nama": "Budi Santoso",
+            "nis": 12345,
+            "kelas_id": 1,
+            "kelas": {
+              "id": 1,
+              "nama_kelas": "XI RPL 1",
+              "tingkat": "XI",
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z"
+            },
+            "created_at": "2026-10-26T08:00:00.000000Z",
+            "updated_at": "2026-10-26T08:00:00.000000Z"
+          }
+        }
+      },
+      "DashboardResponseExample": {
+        "summary": "Statistik perpustakaan",
+        "value": {
+          "data": {
+            "stats": {
+              "total_buku": 120,
+              "total_author": 18,
+              "total_kategori": 9,
+              "total_siswa": 240,
+              "total_kelas": 12
+            },
+            "chart": {
+              "labels": ["Mei", "Jun", "Jul", "Agu", "Sep", "Okt"],
+              "data": [3, 5, 2, 8, 6, 4]
+            },
+            "recent_buku": [
+              {
+                "id": 1,
+                "judul": "Belajar OpenAPI",
+                "stock": 5,
+                "author_id": 1,
+                "author": {
+                  "id": 1,
+                  "nama_author": "Eko Kurniawan",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z"
+                },
+                "kategoris": [
+                  {
+                    "id": 1,
+                    "nama_kategori": "Programming",
+                    "created_at": "2026-10-26T08:00:00.000000Z",
+                    "updated_at": "2026-10-26T08:00:00.000000Z"
+                  }
+                ],
+                "created_at": "2026-10-26T08:00:00.000000Z",
+                "updated_at": "2026-10-26T08:00:00.000000Z"
+              }
+            ]
+          }
+        }
+      },
+      "ValidationErrorExample": {
+        "summary": "Contoh error validasi",
+        "value": {
+          "message": "The judul field is required. (and 3 more errors)",
+          "errors": {
+            "judul": ["The judul field is required."],
+            "stock": ["The stock field must be at least 0."],
+            "author_id": ["The selected author id is invalid."],
+            "kategori_id": ["The kategori id field is required."]
+          }
+        }
+      }
+    }
+  }
+}

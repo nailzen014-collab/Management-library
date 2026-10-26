@@ -1,0 +1,31 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/kelas/:kelas_id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: kelas_id
+    value: "1"
+    disabled: false
+    description: (Required) ID kelas.
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+body:
+  type: json
+  content: |-
+    {
+      "nama_kelas": "XI RPL 1",
+      "tingkat": "XI"
+    }
+settings: {}
+examples: ./.resources/Perbarui kelas.resources/examples
+order: 4000

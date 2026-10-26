@@ -1,0 +1,32 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/siswa/:siswa_id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: siswa_id
+    value: "1"
+    disabled: false
+    description: (Required) ID siswa.
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+body:
+  type: json
+  content: |-
+    {
+      "nama": "Budi Santoso",
+      "nis": 12345,
+      "kelas_id": 1
+    }
+settings: {}
+examples: ./.resources/Perbarui siswa.resources/examples
+order: 4000

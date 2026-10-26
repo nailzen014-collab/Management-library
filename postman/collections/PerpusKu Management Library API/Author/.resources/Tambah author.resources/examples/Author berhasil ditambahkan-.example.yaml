@@ -1,0 +1,134 @@
+$kind: http-example
+name: Author berhasil ditambahkan.
+request:
+  url: "{{baseUrl}}/author"
+  method: POST
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+    - key: Accept
+      value: application/json
+  pathVariables:
+    - key: scheme
+      value: "{{scheme}}"
+      description: Skema protokol yang digunakan. (This can only be one of http,https)
+    - key: host
+      value: "{{host}}"
+      description: Host tempat aplikasi berjalan.
+    - key: port
+      value: "{{port}}"
+      description: Port aplikasi Laravel.
+  body:
+    type: json
+    content: |-
+      {
+        "nama_author": "Eko Kurniawan"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Author berhasil ditambahkan.",
+        "data": {
+          "id": 1,
+          "nama_author": "Eko Kurniawan",
+          "created_at": "2026-10-26T08:00:00.000000Z",
+          "updated_at": "2026-10-26T08:00:00.000000Z",
+          "buku_count": 2,
+          "buku": [
+            {
+              "id": 1,
+              "judul": "Belajar OpenAPI",
+              "stock": 5,
+              "author_id": 1,
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z",
+              "author": {
+                "value": "<Circular reference to #/components/schemas/Author detected>"
+              },
+              "kategoris": [
+                {
+                  "id": 1,
+                  "nama_kategori": "Programming",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z",
+                  "buku_count": 3,
+                  "buku": [
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    },
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    }
+                  ]
+                },
+                {
+                  "id": 1,
+                  "nama_kategori": "Programming",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z",
+                  "buku_count": 3,
+                  "buku": [
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    },
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "judul": "Belajar OpenAPI",
+              "stock": 5,
+              "author_id": 1,
+              "created_at": "2026-10-26T08:00:00.000000Z",
+              "updated_at": "2026-10-26T08:00:00.000000Z",
+              "author": {
+                "value": "<Circular reference to #/components/schemas/Author detected>"
+              },
+              "kategoris": [
+                {
+                  "id": 1,
+                  "nama_kategori": "Programming",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z",
+                  "buku_count": 3,
+                  "buku": [
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    },
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    }
+                  ]
+                },
+                {
+                  "id": 1,
+                  "nama_kategori": "Programming",
+                  "created_at": "2026-10-26T08:00:00.000000Z",
+                  "updated_at": "2026-10-26T08:00:00.000000Z",
+                  "buku_count": 3,
+                  "buku": [
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    },
+                    {
+                      "value": "<Error: Too many levels of nesting to fake this schema>"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+order: 1000

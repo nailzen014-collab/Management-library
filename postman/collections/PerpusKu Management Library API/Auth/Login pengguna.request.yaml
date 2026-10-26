@@ -1,0 +1,41 @@
+$kind: http-request
+description: Memvalidasi email dan password, lalu mengembalikan Bearer token baru.
+url: "{{baseUrl}}/login"
+method: POST
+auth:
+  type: noauth
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+body:
+  type: json
+  content: |-
+    {
+      "email": "api.tester@example.com",
+      "password": "password"
+    }
+settings: {}
+scripts:
+  - type: afterResponse
+    code: |-
+      const body = pm.response.json();
+      if (body && body.data && body.data.token) {
+        pm.collectionVariables.set('bearerToken', body.data.token);
+        pm.environment.set('bearerToken', body.data.token);
+        pm.test('Bearer token tersimpan', function () {
+          pm.expect(body.data.token).to.be.a('string').and.not.empty;
+        });
+      }
+    language: text/javascript
+examples: ./.resources/Login pengguna.resources/examples
+order: 2000

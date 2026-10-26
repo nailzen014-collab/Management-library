@@ -1,0 +1,17 @@
+$kind: collection
+description: |-
+  Kontrak API JSON untuk aplikasi Management Library (PerpusKu). API ini mengikuti data dan aturan validasi yang ada pada website: autentikasi pengguna, dashboard, buku, author, kategori, kelas, dan siswa (anggota perpustakaan).
+
+  Catatan: fitur peminjaman belum tersedia pada aplikasi saat ini, sehingga belum didokumentasikan sebagai endpoint. Semua endpoint yang dilindungi menggunakan Bearer token yang diperoleh dari endpoint login atau register.
+variables:
+  scheme: http
+  host: localhost
+  port: "8000"
+  baseUrl: "{{scheme}}://{{host}}:{{port}}/api/v1"
+  bearerToken: ""
+auth:
+  - id: 8945d349-6aa4-4935-be63-31c3276ed0eb
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{bearerToken}}"

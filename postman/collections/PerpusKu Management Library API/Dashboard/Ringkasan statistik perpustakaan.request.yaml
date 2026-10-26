@@ -1,0 +1,19 @@
+$kind: http-request
+description: Mengembalikan jumlah buku, author, kategori, siswa, kelas, grafik buku enam bulan terakhir, dan lima buku terbaru.
+url: "{{baseUrl}}/dashboard"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: scheme
+    value: "{{scheme}}"
+    description: Skema protokol yang digunakan. (This can only be one of http,https)
+  - key: host
+    value: "{{host}}"
+    description: Host tempat aplikasi berjalan.
+  - key: port
+    value: "{{port}}"
+    description: Port aplikasi Laravel.
+settings: {}
+examples: ./.resources/Ringkasan statistik perpustakaan.resources/examples
+order: 1000
